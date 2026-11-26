@@ -14,15 +14,15 @@
     "@astrojs/node": "11.1.14",
     "@astrojs/react": "7.1.9",
     "@kubernetes/client-node": "2.0.2",
-    "@radix-ui/react-slot": "1.5.0",
     "astro": "7.4.13",
     "class-variance-authority": "0.7.1",
-    "clsx": "2.1.1",
+    "cn": "0.5.2",
     "lucide-react": "1.80.0",
     "oxc-transform-react": "0.156.0",
+    "radix-ui": "1.8.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "tailwind-merge": "3.7.1"
+    "shadcn": "4.23.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",

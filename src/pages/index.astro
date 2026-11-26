@@ -1,5 +1,6 @@
 ---
 import RunList from "@/components/RunList";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Main from "@/layouts/main.astro";
 import { messageOf, reconcile } from "@/lib/runs";
 import type { RunMeta } from "@/lib/types";
@@ -19,13 +20,13 @@ try {
   <main class="mx-auto max-w-3xl space-y-8 px-6 py-12">
     <header class="space-y-2">
       <h1 class="text-3xl font-semibold tracking-tight">wc</h1>
-      <p class="text-neutral-400">Run the agent. One run at a time.</p>
+      <p class="text-muted-foreground">Run the agent. One run at a time.</p>
     </header>
 
     {loadError && (
-      <p class="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-        {loadError}
-      </p>
+      <Alert variant="destructive">
+        <AlertDescription>{loadError}</AlertDescription>
+      </Alert>
     )}
 
     <RunList client:load initial={runs} />

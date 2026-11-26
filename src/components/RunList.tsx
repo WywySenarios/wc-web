@@ -1,8 +1,25 @@
-import { Loader2, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { StatusBadge } from "@/components/StatusBadge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Spinner } from "@/components/ui/spinner";
 import { isActive } from "@/lib/status";
 import type { RunMeta } from "@/lib/types";
 
@@ -56,54 +73,60 @@ export default function RunList({ initial }: { initial: RunMeta[] }) {
   }
 
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-semibold">Runs</h2>
-          <p className="text-sm text-neutral-400">
-            {inFlight ? "One run is active." : "No active run."}
-          </p>
-        </div>
-        <Button onClick={start} disabled={inFlight} size="lg">
-          {busy ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Play className="size-4" />
-          )}
-          Run
-        </Button>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Runs</CardTitle>
+        <CardDescription>
+          {inFlight ? "One run is active." : "No active run."}
+        </CardDescription>
+        <CardAction>
+          <Button onClick={start} disabled={inFlight} size="lg">
+            {busy ? <Spinner /> : <Play />}
+            Run
+          </Button>
+        </CardAction>
+      </CardHeader>
 
-      {error && (
-        <p className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-          {error}
-        </p>
-      )}
+      <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {runs.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-800 p-8 text-center text-sm text-neutral-500">
-          No runs yet.
-        </p>
-      ) : (
-        <ul className="divide-y divide-neutral-800 overflow-hidden rounded-lg border border-neutral-800">
-          {runs.map((run) => (
-            <li key={run.id}>
-              <a
-                href={`/sessions/${run.id}`}
-                className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-neutral-900"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-mono text-sm">{run.id}</p>
-                  <p className="text-xs text-neutral-500">
-                    {new Date(run.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <StatusBadge status={run.status} />
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+        {runs.length === 0 ? (
+          <Empty className="border">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Play />
+              </EmptyMedia>
+              <EmptyTitle>No runs yet.</EmptyTitle>
+              <EmptyDescription>
+                Start a run to see its output here.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <ul className="divide-y divide-border">
+            {runs.map((run) => (
+              <li key={run.id}>
+                <a
+                  href={`/sessions/${run.id}`}
+                  className="flex items-center justify-between gap-4 py-3 hover:bg-accent"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-mono text-sm">{run.id}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(run.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <StatusBadge status={run.status} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }

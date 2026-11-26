@@ -1,5 +1,17 @@
+import { ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { isTerminal } from "@/lib/status";
 import { buildEntries } from "@/lib/transcript";
 import type { HarnessEvent, RunStatus } from "@/lib/types";
@@ -61,7 +73,10 @@ export default function Transcript({
   return (
     <section className="space-y-3">
       {waiting && (
-        <p className="text-sm text-neutral-500">Waiting for output…</p>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
       )}
 
       {entries.map((entry) => {
@@ -69,7 +84,7 @@ export default function Transcript({
           return (
             <div
               key={entry.id}
-              className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-100"
+              className="whitespace-pre-wrap text-sm leading-relaxed text-foreground"
             >
               {entry.text}
               {entry.streaming && (
@@ -80,52 +95,55 @@ export default function Transcript({
         }
         if (entry.kind === "tool") {
           return (
-            <details
-              key={entry.id}
-              className="rounded-md border border-neutral-800 bg-neutral-900/40"
-            >
-              <summary className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm">
-                <span className="font-mono">{entry.name}</span>
-                {entry.exit !== undefined && (
-                  <span
-                    className={
-                      entry.exit === 0 ? "text-emerald-400" : "text-red-400"
-                    }
+            <Card key={entry.id} className="gap-0 py-0">
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="group h-auto w-full justify-start gap-2 rounded-none px-4 py-3"
                   >
-                    exit {entry.exit}
-                  </span>
-                )}
-              </summary>
-              <div className="space-y-2 border-t border-neutral-800 px-3 py-2">
-                {entry.args && (
-                  <pre className="overflow-x-auto text-xs text-neutral-400">
-                    {entry.args}
-                  </pre>
-                )}
-                {entry.output && (
-                  <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-neutral-300">
-                    {entry.output}
-                    {entry.truncated ? "\n[truncated]" : ""}
-                  </pre>
-                )}
-              </div>
-            </details>
+                    <span className="font-mono">{entry.name}</span>
+                    {entry.exit !== undefined && (
+                      <Badge
+                        variant={entry.exit === 0 ? "secondary" : "destructive"}
+                      >
+                        exit {entry.exit}
+                      </Badge>
+                    )}
+                    <ChevronDown className="ml-auto size-4 transition-transform group-data-[state=open]:rotate-180" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <Separator />
+                  <div className="space-y-2 px-4 py-3">
+                    {entry.args && (
+                      <pre className="overflow-x-auto text-xs text-muted-foreground">
+                        {entry.args}
+                      </pre>
+                    )}
+                    {entry.output && (
+                      <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-muted-foreground">
+                        {entry.output}
+                        {entry.truncated ? "\n[truncated]" : ""}
+                      </pre>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
           );
         }
         if (entry.kind === "error") {
           return (
-            <p
-              key={entry.id}
-              className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300"
-            >
-              {entry.text}
-            </p>
+            <Alert key={entry.id} variant="destructive">
+              <AlertDescription>{entry.text}</AlertDescription>
+            </Alert>
           );
         }
         return (
           <pre
             key={entry.id}
-            className="overflow-x-auto text-xs text-neutral-600"
+            className="overflow-x-auto text-xs text-muted-foreground/60"
           >
             {entry.text}
           </pre>
@@ -133,9 +151,9 @@ export default function Transcript({
       })}
 
       {streamError && !isTerminal(status) && (
-        <p className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-          {streamError}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{streamError}</AlertDescription>
+        </Alert>
       )}
     </section>
   );
