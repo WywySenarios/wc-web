@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Runs the type checker. Fails closed when dependencies are missing.
+
+set -euo pipefail
+
+REPO_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
+cd "$REPO_ROOT"
+
+if [ ! -x node_modules/.bin/astro ]; then
+	echo "check: dependencies are not installed — run npm install (failing closed)" >&2
+	exit 1
+fi
+
+echo "==> astro check"
+npm run check
+echo "    ok: astro check"

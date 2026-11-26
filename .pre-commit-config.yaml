@@ -1,0 +1,34 @@
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/betterleaks/betterleaks
+    rev: v1.9.0
+    hooks:
+      - id: betterleaks
+        args: ["--redact", "--no-banner"]
+        stages: [pre-commit]
+
+  - repo: local
+    hooks:
+      - id: format
+        name: format
+        entry: scripts/tests/format
+        language: system
+        pass_filenames: false
+      - id: typecheck
+        name: typecheck
+        entry: scripts/tests/check
+        language: system
+        pass_filenames: false
+      - id: unit
+        name: unit
+        entry: scripts/tests/unit
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: betterleaks-history
+        name: betterleaks history
+        entry: betterleaks git . --redact --no-banner --verbose
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

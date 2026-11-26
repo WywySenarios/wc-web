@@ -1,0 +1,35 @@
+---
+import Main from "@/layouts/main.astro";
+import { StatusBadge } from "@/components/StatusBadge";
+import Transcript from "@/components/Transcript";
+import { isValidRunId } from "@/lib/session";
+import { readMeta } from "@/lib/store";
+
+export const prerender = false;
+
+const id = Astro.params.id ?? "";
+if (!isValidRunId(id)) return Astro.redirect("/");
+
+const meta = await readMeta(id);
+if (!meta) return new Response("run not found", { status: 404 });
+---
+
+<Main title={id}>
+  <main class="mx-auto max-w-3xl space-y-6 px-6 py-12">
+    <a href="/" class="text-sm text-neutral-400 hover:text-neutral-200">
+      ← Back
+    </a>
+
+    <header class="space-y-2">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="font-mono text-lg">{id}</h1>
+        <StatusBadge status={meta.status} />
+      </div>
+      <p class="text-sm text-neutral-500">
+        Created {new Date(meta.createdAt).toLocaleString()}
+      </p>
+    </header>
+
+    <Transcript client:load id={id} initialStatus={meta.status} />
+  </main>
+</Main>

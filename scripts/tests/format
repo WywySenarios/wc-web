@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Checks formatting with the repo-local Prettier. Fails closed when the
+# dependency is missing.
+
+set -euo pipefail
+
+REPO_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
+cd "$REPO_ROOT"
+
+if [ ! -x node_modules/.bin/prettier ]; then
+	echo "format: prettier is not installed — run npm install (failing closed)" >&2
+	exit 1
+fi
+
+echo "==> prettier --check"
+npm exec -- prettier --check .
+echo "    ok: prettier"
